@@ -15,7 +15,7 @@ export const onBoardUser = async()=>{
 
         const {id,firstName,lastName,imageUrl,emailAddresses}=user;
 
-        const newUser=db.user.upsert({
+        const newUser= await db.user.upsert({
             where:{
                 clerkId:id
             },
