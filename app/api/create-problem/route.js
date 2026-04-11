@@ -1,11 +1,12 @@
-import { currentUserRole , getCurrentUser } from "@/modules/auth/actions";
-import { UserRole } from "@prisma/client";
-import { NextResponse } from "next/server";
 import {
   getJudge0LanguageId,
   pollBatchResults,
   submitBatch,
-} from "../../../lib/judge0";
+} from "@/lib/judge0";
+import { currentUserRole, getCurrentUser } from "@/modules/auth/actions";
+
+import { UserRole } from "@prisma/client";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 export async function POST(request) {
@@ -19,7 +20,6 @@ export async function POST(request) {
 
     const body = await request.json();
 
-    //get all the fields from client side
     const {
       title,
       description,
@@ -75,6 +75,8 @@ export async function POST(request) {
           { status: 400 },
         );
       }
+      console.log("LANGUAGE:", language);
+      console.log("SOURCE CODE:\n", solutionCode);
 
       // Step 2.2: Prepare Judge0 submissions for all test cases
       const submissions = testCases.map(({ input, output }) => ({
@@ -121,33 +123,34 @@ export async function POST(request) {
           );
         }
       }
-      // Step 3: Save the problem in the database after all validations pass
-      const newProblem = await db.problem.create({
-        data: {
-          title,
-          description,
-          difficulty,
-          tags,
-          examples,
-          constraints,
-          testCases,
-          codeSnippets,
-          referenceSolutions,
-          userId: user.id,
-        },
-      });
-
-      return NextResponse.json(
-        {
-          success: true,
-          message: "Problem created successfully",
-          data: newProblem,
-        },
-        { status: 201 },
-      );
     }
-  } catch (error) {
-    console.error("Database error:", error);
+
+    // Step 3: Save the problem in the database after all validations pass
+    const newProblem = await db.problem.create({
+      data: {
+        title,
+        description,
+        difficulty,
+        tags,
+        examples,
+        constraints,
+        testCases,
+        codeSnippets,
+        referenceSolutions,
+        userId: user.id,
+      },
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Problem created successfully",
+        data: newProblem,
+      },
+      { status: 201 },
+    );
+  } catch (dbError) {
+    console.error("Database error:", dbError);
     return NextResponse.json(
       { error: "Failed to save problem to database" },
       { status: 500 },
