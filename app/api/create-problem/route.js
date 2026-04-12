@@ -85,15 +85,27 @@ export async function POST(request) {
         stdin: input,
         expected_output: output,
       }));
+      
+      let tokens;
+      let results;
 
-      // Step 2.3: Submit all test cases in one batch
-      const submissionResults = await submitBatch(submissions);
+      try {
+        // Step 2.3: Submit all test cases in one batch
+        const submissionResults = await submitBatch(submissions);
 
-      // Step 2.4: Extract tokens from response
-      const tokens = submissionResults.map((res) => res.token);
+        // Step 2.4: Extract tokens from response
+        tokens = submissionResults.map((res) => res.token);
 
-      // Step 2.5: Poll Judge0 until all submissions are done
-      const results = await pollBatchResults(tokens);
+        // Step 2.5: Poll Judge0 until all submissions are done
+        results = await pollBatchResults(tokens);
+      } catch (err) {
+        console.error("Judge0 error:", err.response?.data || err.message);
+
+        return NextResponse.json(
+          { error: "Code execution failed. Please try again." },
+          { status: 500 },
+        );
+      }
 
       // Step 2.6: Validate that each test case passed (status.id === 3)
       for (let i = 0; i < results.length; i++) {
@@ -101,7 +113,8 @@ export async function POST(request) {
         console.log(`Test case ${i + 1} details:`, {
           input: submissions[i].stdin,
           expectedOutput: submissions[i].expected_output,
-          actualOutput: result.stdout,
+          actualOutput: result.stdout?.trim(),
+          expectedOutput: submissions[i].expected_output?.trim(),
           status: result.status,
           language: language,
           error: result.stderr || result.compile_output,
@@ -114,7 +127,8 @@ export async function POST(request) {
               testCase: {
                 input: submissions[i].stdin,
                 expectedOutput: submissions[i].expected_output,
-                actualOutput: result.stdout,
+                actualOutput: result.stdout?.trim(),
+                expectedOutput: submissions[i].expected_output?.trim(),
                 error: result.stderr || result.compile_output,
               },
               details: result,
