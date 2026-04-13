@@ -46,7 +46,7 @@ const problemSchema = z.object({
       z.object({
         input: z.string().min(1, "Input is required"),
         output: z.string().min(1, "Output is required"),
-      })
+      }),
     )
     .min(1, "At least one test case is required"),
   examples: z.object({
@@ -129,47 +129,16 @@ const sampledpData = {
 * @param {number} n
 * @return {number}
 */
-function climbStairs(n) {
+function solution(n) {
 // Write your code here
-}
-
-// Parse input and execute
-const readline = require('readline');
-const rl = readline.createInterface({
-input: process.stdin,
-output: process.stdout,
-terminal: false
-});
-
-rl.on('line', (line) => {
-const n = parseInt(line.trim());
-const result = climbStairs(n);
-
-console.log(result);
-rl.close();
-});`,
+}`,
     PYTHON: `class Solution:
-  def climbStairs(self, n: int) -> int:
-      # Write your code here
-      pass
-
-# Input parsing
-if __name__ == "__main__":
-  import sys
-  
-  # Parse input
-  n = int(sys.stdin.readline().strip())
-  
-  # Solve
-  sol = Solution()
-  result = sol.climbStairs(n)
-  
-  # Print result
-  print(result)`,
+  def solution(self, n: int) -> int:
+      pass`,
     JAVA: `import java.util.Scanner;
 
 class Main {
-  public int climbStairs(int n) {
+  public int solution(int n) {
       // Write your code here
       return 0;
   }
@@ -180,7 +149,7 @@ class Main {
       
       // Use Main class instead of Solution
       Main main = new Main();
-      int result = main.climbStairs(n);
+      int result = main.solution(n);
       
       System.out.println(result);
       scanner.close();
@@ -192,7 +161,7 @@ class Main {
 * @param {number} n
 * @return {number}
 */
-function climbStairs(n) {
+function solution(n) {
 // Base cases
 if (n <= 2) {
   return n;
@@ -210,7 +179,7 @@ for (let i = 3; i <= n; i++) {
 return dp[n];
 }`,
     PYTHON: `class Solution:
-  def climbStairs(self, n: int) -> int:
+  def solution(self, n: int) -> int:
       # Base cases
       if n <= 2:
           return n
@@ -224,26 +193,22 @@ return dp[n];
           dp[i] = dp[i - 1] + dp[i - 2]
       
       return dp[n]`,
-    JAVA: `import java.util.Scanner;
-
-class Main {
-  public int climbStairs(int n) {
-      // Base cases
-      if (n <= 2) {
-          return n;
-      }
-      
-      // Dynamic programming approach
-      int[] dp = new int[n + 1];
-      dp[1] = 1;
-      dp[2] = 2;
-      
-      for (int i = 3; i <= n; i++) {
-          dp[i] = dp[i - 1] + dp[i - 2];
-      }
-      
-      return dp[n];
+    JAVA: `
+public int solution(int n) {
+  // Base cases
+  if (n <= 2) {
+    return n;
   }
+
+  int[] dp = new int[n + 1];
+  dp[1] = 1;
+  dp[2] = 2;
+
+  for (int i = 3; i <= n; i++) {
+    dp[i] = dp[i - 1] + dp[i - 2];
+  }
+
+  return dp[n];
 }`,
   },
 };
@@ -297,44 +262,13 @@ const sampleStringProblem = {
    * @param {string} s
    * @return {boolean}
    */
-  function isPalindrome(s) {
+  function solution(s) {
     // Write your code here
   }
-  
-  // Add readline for dynamic input handling
-  const readline = require('readline');
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    terminal: false
-  });
-  
-  // Process input line
-  rl.on('line', (line) => {
-    // Call solution with the input string
-    const result = isPalindrome(line);
-    
-    // Output the result
-    console.log(result ? "true" : "false");
-    rl.close();
-  });`,
+`,
     PYTHON: `class Solution:
-      def isPalindrome(self, s: str) -> bool:
-          # Write your code here
-          pass
-  
-  # Input parsing
-  if __name__ == "__main__":
-      import sys
-      # Read the input string
-      s = sys.stdin.readline().strip()
-      
-      # Call solution
-      sol = Solution()
-      result = sol.isPalindrome(s)
-      
-      # Output result
-      print(str(result).lower())  # Convert True/False to lowercase true/false`,
+    def solution(self, s: str) -> bool:
+        pass`,
     JAVA: `import java.util.Scanner;
 
 public class Main {
@@ -342,108 +276,55 @@ public class Main {
         return s.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
     }
 
-    public static boolean isPalindrome(String s) {
-       
+    public boolean solution(String s) {
+       return false;
     }
 
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        String input = sc.nextLine();
+    Scanner sc = new Scanner(System.in);
+    String input = sc.nextLine();
 
-        boolean result = isPalindrome(input);
-        System.out.println(result ? "true" : "false");
-    }
+    Main obj = new Main();
+    boolean result = obj.solution(input);
+
+    System.out.println(result ? "true" : "false");
+}
 }
 `,
   },
   referenceSolutions: {
-    JAVASCRIPT: `/**
-   * @param {string} s
-   * @return {boolean}
-   */
-  function isPalindrome(s) {
-    // Convert to lowercase and remove non-alphanumeric characters
-    s = s.toLowerCase().replace(/[^a-z0-9]/g, '');
-    
-    // Check if it's a palindrome
-    let left = 0;
-    let right = s.length - 1;
-    
-    while (left < right) {
-      if (s[left] !== s[right]) {
-        return false;
-      }
-      left++;
-      right--;
+    JAVASCRIPT: `function solution(s) {
+  s = s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  let left = 0;
+  let right = s.length - 1;
+
+  while (left < right) {
+    if (s[left] !== s[right]) {
+      return false;
     }
-    
-    return true;
+    left++;
+    right--;
   }
-  
-  // Add readline for dynamic input handling
-  const readline = require('readline');
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    terminal: false
-  });
-  
-  // Process input line
-  rl.on('line', (line) => {
-    // Call solution with the input string
-    const result = isPalindrome(line);
-    
-    // Output the result
-    console.log(result ? "true" : "false");
-    rl.close();
-  });`,
+
+  return true;
+}`,
     PYTHON: `class Solution:
-      def isPalindrome(self, s: str) -> bool:
-          # Convert to lowercase and keep only alphanumeric characters
-          filtered_chars = [c.lower() for c in s if c.isalnum()]
-          
-          # Check if it's a palindrome
-          return filtered_chars == filtered_chars[::-1]
-  
-  # Input parsing
-  if __name__ == "__main__":
-      import sys
-      # Read the input string
-      s = sys.stdin.readline().strip()
-      
-      # Call solution
-      sol = Solution()
-      result = sol.isPalindrome(s)
-      
-      # Output result
-      print(str(result).lower())  # Convert True/False to lowercase true/false`,
-    JAVA: `import java.util.Scanner;
+    def solution(self, s: str) -> bool:
+        filtered_chars = [c.lower() for c in s if c.isalnum()]
+        return filtered_chars == filtered_chars[::-1]`,
+    JAVA: `public boolean solution(String s) {
+  s = s.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
 
-public class Main {
-    public static String preprocess(String s) {
-        return s.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
-    }
+  int left = 0, right = s.length() - 1;
 
-    public static boolean isPalindrome(String s) {
-        s = preprocess(s);
-        int left = 0, right = s.length() - 1;
+  while (left < right) {
+    if (s.charAt(left) != s.charAt(right)) return false;
+    left++;
+    right--;
+  }
 
-        while (left < right) {
-            if (s.charAt(left) != s.charAt(right)) return false;
-            left++;
-            right--;
-        }
-
-        return true;
-    }
-
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        String input = sc.nextLine();
-
-        boolean result = isPalindrome(input);
-        System.out.println(result ? "true" : "false");
-    }
+  return true;
 }
 `,
   },
@@ -501,9 +382,22 @@ const CreateProblemForm = () => {
         JAVA: { input: "", output: "", explanation: "" },
       },
       codeSnippets: {
-        JAVASCRIPT: "function solution() {\n  // Write your code here\n}",
-        PYTHON: "def solution():\n    # Write your code here\n    pass",
-        JAVA: "public class Solution {\n    public static void main(String[] args) {\n        // Write your code here\n    }\n}",
+        JAVASCRIPT: "function solution(input) {\n  // Write your code here\n}",
+        PYTHON: "def solution(input):\n    # Write your code here\n    pass",
+        JAVA: `class Main {
+  public int solution(int n) {
+    // Write your code here
+    return 0;
+  }
+
+  public static void main(String[] args) {
+    java.util.Scanner sc = new java.util.Scanner(System.in);
+    int n = Integer.parseInt(sc.nextLine().trim());
+
+    Main obj = new Main();
+    System.out.println(obj.solution(n));
+  }
+}`,
       },
       referenceSolutions: {
         JAVASCRIPT: "// Add your reference solution here",
@@ -552,8 +446,9 @@ const CreateProblemForm = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-      console.log("API response:", response);
-      toast.success(response.message || "Problem created successfully");
+      const data = await response.json();
+      console.log("API response:", data);
+      toast.success(data.message || "Problem created successfully");
       router.push("/problems");
     } catch (error) {
       console.error("Error creating problem:", error);
