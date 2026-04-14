@@ -12,6 +12,18 @@ enum UserRole {
   USER
 }
 
+model ProblemSolved {
+  id        String   @id @default(uuid())
+  userId    String
+  problemId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, problemId])
+}
+
 model User {
   id        String   @id @default(uuid())
   clerkId   String   @unique
@@ -21,7 +33,8 @@ model User {
   lastName  String?
   imageUrl  String?
 
-  problems Problem[]
+  problems       Problem[]
+  solvedProblems ProblemSolved[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -48,15 +61,15 @@ model Problem {
   hints       String?
   editorial   String?
 
-  testCases        Json
-  codeSnippets     Json
+  testCases          Json
+  codeSnippets       Json
   referenceSolutions Json
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  solvedBy ProblemSolved[]
 
   @@index([difficulty])
 }
-

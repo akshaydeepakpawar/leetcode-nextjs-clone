@@ -18,6 +18,13 @@ export const getAllProblems = async () => {
     });
 
     const problems = await db.problem.findMany({
+      include:{
+        solvedBy:{
+          where:{
+            userId:data?.id
+          }
+        }
+      },
       orderBy: {
         createdAt: "desc",
       },
@@ -43,27 +50,38 @@ export const getProblemById = async (id) => {
   }
 };
 
-export const deleteProblem=async(problemId)=>{
-    try {
-        const user=await currentUser();
-        if(!user){
-            throw new Error("Unauthorized")
-        }
-        if(user?.role!==UserRole.ADMIN){
-            throw new Error("only admin can delete problems")
-        }
-        await db.problem.delete({
-            where:{
-                id:problemId
-            }
-        })
-        revalidatePath("/problems")
-        return { success: true, message:"problem deleted succesfully" };
-    } catch (error) {
-        console.error("Error deleting problem:",error)
-        return {
-            success:false,
-            error:error.message|| "Failed to delete problem"
-        }
+export const deleteProblem = async (problemId) => {
+  try {
+    const user = await currentUser();
+
+    if (!user) {
+      throw new Error("Unauthorized");
     }
-}
+
+    const dbUser = await db.user.findUnique({
+      where: {
+        clerkId: user.id,
+      },
+    });
+
+    if (!dbUser || dbUser.role !== UserRole.ADMIN) {
+      throw new Error("only admin can delete problems");
+    }
+
+    await db.problem.delete({
+      where: {
+        id: problemId,
+      },
+    });
+
+    revalidatePath("/problems");
+
+    return { success: true, message: "problem deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting problem:", error);
+    return {
+      success: false,
+      error: error.message || "Failed to delete problem",
+    };
+  }
+};
