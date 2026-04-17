@@ -11,12 +11,12 @@ import {
   Search,
   Filter,
 } from "lucide-react";
-// import AddToPlaylistModal from "./add-to-playlist";
-// import CreatePlaylistModal from "./create-playlist";
+import AddToPlaylistModal from "./add-to-playlist";
+import CreatePlaylistModal from "./create-playlist";
 import {
-//   createPlaylist,
+  createPlaylist,
   deleteProblem,
-//   addProblemToPlaylist,
+  addProblemToPlaylist,
 } from "../actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,65 +94,65 @@ const ProblemsTable = ({ problems, user }) => {
     }
   };
 
-//   const handleCreatePlaylist = async (data) => {
-//     try {
-//       const response = await fetch("/api/playlists", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//           name: data.name,
-//           description: data.description,
-//         }),
-//       });
+  const handleCreatePlaylist = async (data) => {
+    try {
+      const response = await fetch("/api/playlists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name,
+          description: data.description,
+        }),
+      });
 
-//       const result = await response.json();
+      const result = await response.json();
 
-//       if (result.success) {
-//         setIsCreateModalOpen(false);
-//         toast.success("Playlist created successfully");
-//       } else {
-//         throw new Error(result.error);
-//       }
-//     } catch (error) {
-//       console.error("Error creating playlist:", error);
-//       toast.error(error.message || "Failed to create playlist");
-//     }
-//   };
+      if (result.success) {
+        setIsCreateModalOpen(false);
+        toast.success("Playlist created successfully");
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error("Error creating playlist:", error);
+      toast.error(error.message || "Failed to create playlist");
+    }
+  };
 
-//   const handleAddToPlaylist = async (problemId, playlistId) => {
-//     try {
-//       const response = await fetch("/api/playlists/add-problem", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ problemId, playlistId }),
-//       });
+  const handleAddToPlaylist = async (problemId, playlistId) => {
+    try {
+      const response = await fetch("/api/playlists/add-problem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ problemId, playlistId }),
+      });
 
-//       const result = await response.json();
+      const result = await response.json();
 
-//       if (result.success) {
-//         setIsAddToPlaylistModalOpen(false);
-//         toast.success("Problem added to playlist");
-//       } else {
-//         throw new Error(result.error);
-//       }
-//     } catch (error) {
-//       console.error("Error adding to playlist:", error);
-//       toast.error(error.message || "Failed to add problem to playlist");
-//     }
-//   };
+      if (result.success) {
+        setIsAddToPlaylistModalOpen(false);
+        toast.success("Problem added to playlist");
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error("Error adding to playlist:", error);
+      toast.error(error.message || "Failed to add problem to playlist");
+    }
+  };
 
-//   const getDifficultyVariant = (difficulty) => {
-//     switch (difficulty) {
-//       case "EASY":
-//         return "default";
-//       case "MEDIUM":
-//         return "secondary";
-//       case "HARD":
-//         return "destructive";
-//       default:
-//         return "outline";
-//     }
-//   };
+  const getDifficultyVariant = (difficulty) => {
+    switch (difficulty) {
+      case "EASY":
+        return "default";
+      case "MEDIUM":
+        return "secondary";
+      case "HARD":
+        return "destructive";
+      default:
+        return "outline";
+    }
+  };
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
