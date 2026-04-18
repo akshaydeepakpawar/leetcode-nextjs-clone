@@ -11,8 +11,8 @@ import {
   Search,
   Filter,
 } from "lucide-react";
-import AddToPlaylistModal from "./add-to-playlist";
-import CreatePlaylistModal from "./create-playlist";
+import AddToPlaylistModal from "./addToPlayList";
+import CreatePlaylistModal from "./createPlayList";
 import {
   createPlaylist,
   deleteProblem,
@@ -107,12 +107,17 @@ const ProblemsTable = ({ problems, user }) => {
 
       const result = await response.json();
 
-      if (result.success) {
-        setIsCreateModalOpen(false);
-        toast.success("Playlist created successfully");
-      } else {
-        throw new Error(result.error);
+      if (!response.ok) {
+        // ❌ duplicate case
+        toast({
+          title: "Duplicate Playlist",
+          description: data.error || "Playlist already exists",
+          variant: "destructive",
+        });
+        return;
       }
+      setIsCreateModalOpen(false);
+      toast.success("Playlist created successfully");
     } catch (error) {
       console.error("Error creating playlist:", error);
       toast.error(error.message || "Failed to create playlist");
@@ -379,7 +384,7 @@ const ProblemsTable = ({ problems, user }) => {
         </div>
       )}
 
-      {/* Modals
+      {/* Modals */}
       <CreatePlaylistModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
@@ -391,7 +396,7 @@ const ProblemsTable = ({ problems, user }) => {
         onClose={() => setIsAddToPlaylistModalOpen(false)}
         onSubmit={handleAddToPlaylist}
         problemId={selectedProblemId}
-      /> */}
+      />
     </div>
   );
 };

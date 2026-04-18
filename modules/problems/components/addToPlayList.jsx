@@ -31,7 +31,7 @@ const AddToPlaylistModal = ({ isOpen, onClose, onSubmit, problemId }) => {
         console.error('Error loading playlists:', error);
         toast.error("Failed to load playlists");
       }
-    };
+    }; 
 
     if (isOpen) {
       loadPlaylists();

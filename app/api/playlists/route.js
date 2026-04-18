@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { currentUser } from "@clerk/nextjs/server";
+
 
 export async function POST(request) {
   try {
@@ -15,7 +17,7 @@ export async function POST(request) {
         },
       );
     }
-
+    
     const dbUser = await db.user.findUnique({
       where: {
         clerkId: user.id,
@@ -44,13 +46,27 @@ export async function POST(request) {
       );
     }
 
-    const playlistData = await db.playlist.create({
+    // Check duplicate
+    const existingPlaylist = await db.playlist.findFirst({
       where: {
-        data: {
-          name,
-          description,
-          userId: dbUser.id,
-        },
+        name,
+        userId: dbUser.id,
+      },
+    });
+
+    if (existingPlaylist) {
+      return NextResponse.json(
+        { success: false, error: "Playlist already exists" },
+        { status: 400 },
+      );
+    }
+
+    // Create new playlist
+    const playlist = await db.playlist.create({
+      data: {
+        name,
+        description,
+        userId: dbUser.id,
       },
     });
 
@@ -101,27 +117,36 @@ export async function GET() {
       );
     }
 
-    const playlist= await db.playlist.findMany({
-        where:{userId:dbUser.id},
-        include:{
-            problems:{
-                select:{
-                    id:true,
-                    title:true,
-                    difficulty:true
-                }
-            }
+    // Get user's playlists
+    const playlists = await db.playlist.findMany({
+      where: { userId: dbUser.id },
+      include: {
+        problems: {
+          include: {
+            problem: {
+              select: {
+                id: true,
+                title: true,
+                difficulty: true,
+              },
+            },
+          },
         },
-        orderBy:{createdAt:"desc"}
-    })
+      },
+      orderBy: { createdAt: "desc" },
+    });
     return NextResponse.json({
-        success:true,
-        playlists
-    })
+      success: true,
+      playlists,
+    });
   } catch (error) {
-    console.error("Error fetching playlists:",error);
-    return NextResponse.json({
-        success:false,error:"Failed to fetch playlists"
-    },{status:500})
+    console.error("Error fetching playlists:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to fetch playlists",
+      },
+      { status: 500 },
+    );
   }
 }
