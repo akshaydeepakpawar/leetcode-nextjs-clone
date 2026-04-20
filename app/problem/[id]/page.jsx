@@ -1,49 +1,75 @@
-'use client';
+"use client";
 
-import { useTheme } from 'next-themes';
-import Editor from '@monaco-editor/react';
-import { executeCode, getAllSubmissionByCurrentUserForProblem, getProblemById } from '@/modules/problems/actions';
-import { useState, useEffect } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TestCaseTable } from '@/modules/problems/components/testCaseTable';
-import { SubmissionDetails } from '@/modules/problems/components/submissionDetails';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useTheme } from "next-themes";
+import Editor from "@monaco-editor/react";
+import {
+  executeCode,
+  getAllSubmissionByCurrentUserForProblem,
+  getProblemById,
+} from "@/modules/problems/actions";
+import { useState, useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TestCaseTable } from "@/modules/problems/components/testCaseTable";
+import { SubmissionDetails } from "@/modules/problems/components/submissionDetails";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Play, Send, Code, FileText, Lightbulb, Trophy, ArrowLeft, Loader2 } from 'lucide-react';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Play,
+  Send,
+  Code,
+  FileText,
+  Lightbulb,
+  Trophy,
+  ArrowLeft,
+  Loader2,
+} from "lucide-react";
 
-import { cn } from '@/lib/utils';
-import { ModeToggle } from '@/components/ui/mode-toggle';
-import { getJudge0LanguageId } from '@/lib/judge0';
-import { toast } from 'sonner';
-import { SubmissionHistory } from '@/modules/problems/components/submissionHistory';
-import Link from 'next/link';
-
+import { cn } from "@/lib/utils";
+import { ModeToggle } from "@/components/ui/mode-toggle";
+import { getJudge0LanguageId } from "@/lib/judge0";
+import { toast } from "sonner";
+import { SubmissionHistory } from "@/modules/problems/components/submissionHistory";
+import Link from "next/link";
+import { Editorial } from "../../../modules/problems/components/Editorial";
+import { Hints } from "../../../modules/problems/components/Hints";
 
 const getDifficultyColor = (difficulty) => {
   switch (difficulty) {
-    case 'EASY':
-      return 'bg-green-100 text-green-800 border-green-200';
-    case 'MEDIUM':
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    case 'HARD':
-      return 'bg-red-100 text-red-800 border-red-200';
+    case "EASY":
+      return "bg-green-100 text-green-800 border-green-200";
+    case "MEDIUM":
+      return "bg-yellow-100 text-yellow-800 border-yellow-200";
+    case "HARD":
+      return "bg-red-100 text-red-800 border-red-200";
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-200';
+      return "bg-gray-100 text-gray-800 border-gray-200";
   }
 };
 
 const ProblemIdPage = ({ params }) => {
   const [problem, setProblem] = useState(null);
-  const [selectedLanguage, setSelectedLanguage] = useState('JAVASCRIPT');
-  const [code, setCode] = useState('');
-  const [output, setOutput] = useState('');
+  const [selectedLanguage, setSelectedLanguage] = useState("JAVASCRIPT");
+  const [code, setCode] = useState("");
+  const [output, setOutput] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissionHistory , setSubmissionHistory] = useState([]);
+  const [submissionHistory, setSubmissionHistory] = useState([]);
   const [executionResponse, setExecutionResponse] = useState(null);
   const { theme } = useTheme();
 
@@ -52,35 +78,37 @@ const ProblemIdPage = ({ params }) => {
       try {
         const resolvedParams = await params;
         const problemData = await getProblemById(resolvedParams.id);
-        console.log(problemData); 
+        console.log(problemData);
         if (problemData.success) {
           setProblem(problemData.data);
-          setCode(problemData.data.codeSnippets[selectedLanguage] || '');
+          setCode(problemData.data.codeSnippets[selectedLanguage] || "");
         }
       } catch (error) {
-        console.error('Error fetching problem:', error);
+        console.error("Error fetching problem:", error);
       }
     };
 
     fetchProblem();
   }, [params]);
 
-  useEffect(()=>{
-    const fetchSubmissionHistory = async()=>{
+  useEffect(() => {
+    const fetchSubmissionHistory = async () => {
       try {
         const resolvedParams = await params;
-        const submissionHistory = await getAllSubmissionByCurrentUserForProblem(resolvedParams.id);
+        const submissionHistory = await getAllSubmissionByCurrentUserForProblem(
+          resolvedParams.id,
+        );
         console.log(submissionHistory);
         if (submissionHistory.success) {
           setSubmissionHistory(submissionHistory.data);
         }
       } catch (error) {
-        console.error('Error fetching problem:', error);
+        console.error("Error fetching problem:", error);
       }
-    }
+    };
 
     fetchSubmissionHistory();
-  },[params])
+  }, [params]);
 
   useEffect(() => {
     if (problem && problem.codeSnippets[selectedLanguage]) {
@@ -89,38 +117,41 @@ const ProblemIdPage = ({ params }) => {
   }, [selectedLanguage, problem]);
 
   const handleRun = async () => {
-
-   try {
-    setIsRunning(true);
+    try {
+      setIsRunning(true);
       const language_id = getJudge0LanguageId(selectedLanguage);
       const stdin = problem.testCases.map((tc) => tc.input);
       const expected_outputs = problem.testCases.map((tc) => tc.output);
-      const res = await executeCode(code, language_id, stdin, expected_outputs, problem.id);
+      const res = await executeCode(
+        code,
+        language_id,
+        stdin,
+        expected_outputs,
+        problem.id,
+      );
       setExecutionResponse(res);
-      if(res.success){
+      if (res.success) {
         toast.success("Code executed successfully");
       }
     } catch (error) {
       console.log("Error executing code", error);
       toast.error("Error executing code");
-    }
-    finally {
+    } finally {
       setIsRunning(false);
     }
   };
 
-  const handleSubmit =  () => {
+  const handleSubmit = () => {
     toast.success("TODO: Coming Soon🔥");
   };
 
-  if(!problem){
+  if (!problem) {
     return (
-      <div className='flex flex-col items-center justify-center h-screen'>
-        <Loader2 className='animate-spin size-5 text-amber-400' />
+      <div className="flex flex-col items-center justify-center h-screen">
+        <Loader2 className="animate-spin size-5 text-amber-400" />
       </div>
-    )
+    );
   }
-
 
   return (
     <div className="min-h-screen bg-background">
@@ -135,7 +166,12 @@ const ProblemIdPage = ({ params }) => {
                 </Button>
               </Link>
               <h1 className="text-3xl font-bold">{problem?.title}</h1>
-              <Badge className={cn('font-medium', getDifficultyColor(problem?.difficulty))}>
+              <Badge
+                className={cn(
+                  "font-medium",
+                  getDifficultyColor(problem?.difficulty),
+                )}
+              >
                 {problem?.difficulty}
               </Badge>
             </div>
@@ -162,28 +198,36 @@ const ProblemIdPage = ({ params }) => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  <p className="text-foreground leading-relaxed">{problem?.description}</p>
-                  
+                  <p className="text-foreground leading-relaxed">
+                    {problem?.description}
+                  </p>
+
                   {/* Examples */}
                   <div>
                     <h3 className="font-semibold text-lg mb-3">Example:</h3>
                     {problem?.examples[selectedLanguage] && (
                       <div className="bg-muted p-4 rounded-lg space-y-2">
                         <div>
-                          <span className="font-medium text-amber-400">Input: </span>
+                          <span className="font-medium text-amber-400">
+                            Input:{" "}
+                          </span>
                           <code className="text-sm dark:bg-zinc-900 bg-zinc-200 text-zinc-900 dark:text-zinc-200 px-2 py-1 rounded">
                             {problem?.examples[selectedLanguage].input}
                           </code>
                         </div>
                         <div>
-                          <span className="font-medium text-amber-400">Output: </span>
+                          <span className="font-medium text-amber-400">
+                            Output:{" "}
+                          </span>
                           <code className="text-sm dark:bg-zinc-900 bg-zinc-200 text-zinc-900 dark:text-zinc-200 px-2 py-1 rounded">
                             {problem?.examples[selectedLanguage].output}
                           </code>
                         </div>
                         <div>
                           <span className="font-medium">Explanation: </span>
-                          <span className="text-sm">{problem?.examples[selectedLanguage]?.explanation}</span>
+                          <span className="text-sm">
+                            {problem?.examples[selectedLanguage]?.explanation}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -193,7 +237,9 @@ const ProblemIdPage = ({ params }) => {
                   <div>
                     <h3 className="font-semibold text-lg mb-3">Constraints:</h3>
                     <div className="bg-muted p-4 rounded-lg">
-                      <pre className="text-sm text-muted-foreground whitespace-pre-wrap">{problem?.constraints}</pre>
+                      <pre className="text-sm text-muted-foreground whitespace-pre-wrap">
+                        {problem?.constraints}
+                      </pre>
                     </div>
                   </div>
                 </div>
@@ -205,15 +251,24 @@ const ProblemIdPage = ({ params }) => {
               <CardContent className="p-3">
                 <Tabs defaultValue="submissions" className="w-full">
                   <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="submissions" className="flex items-center gap-2">
+                    <TabsTrigger
+                      value="submissions"
+                      className="flex items-center gap-2"
+                    >
                       <Trophy className="h-4 w-4" />
                       Submissions
                     </TabsTrigger>
-                    <TabsTrigger value="editorial" className="flex items-center gap-2">
+                    <TabsTrigger
+                      value="editorial"
+                      className="flex items-center gap-2"
+                    >
                       <FileText className="h-4 w-4" />
                       Editorial
                     </TabsTrigger>
-                    <TabsTrigger value="hints" className="flex items-center gap-2">
+                    <TabsTrigger
+                      value="hints"
+                      className="flex items-center gap-2"
+                    >
                       <Lightbulb className="h-4 w-4" />
                       Hints
                     </TabsTrigger>
@@ -224,14 +279,10 @@ const ProblemIdPage = ({ params }) => {
                     </div>
                   </TabsContent>
                   <TabsContent value="editorial" className="p-6">
-                    <div className="text-center py-8 text-muted-foreground">
-                      {problem.editorial ? problem.editorial : 'Editorial not available yet.'}
-                    </div>
+                    <Editorial editorial={problem.editorial} />
                   </TabsContent>
                   <TabsContent value="hints" className="p-6">
-                    <div className="text-center py-8 text-muted-foreground">
-                      {problem.hints ? problem.hints : 'No hints available for this problem.'}
-                    </div>
+                    <Hints hints={problem.hints} />
                   </TabsContent>
                 </Tabs>
               </CardContent>
@@ -248,7 +299,10 @@ const ProblemIdPage = ({ params }) => {
                     <Code className="h-5 w-5" />
                     Code Editor
                   </CardTitle>
-                  <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                  <Select
+                    value={selectedLanguage}
+                    onValueChange={setSelectedLanguage}
+                  >
                     <SelectTrigger className="w-32">
                       <SelectValue />
                     </SelectTrigger>
@@ -264,19 +318,23 @@ const ProblemIdPage = ({ params }) => {
                 <div className="border rounded-lg overflow-hidden">
                   <Editor
                     height="400px"
-                    language={selectedLanguage.toLowerCase() === 'javascript' ? 'javascript' : selectedLanguage.toLowerCase()}
+                    language={
+                      selectedLanguage.toLowerCase() === "javascript"
+                        ? "javascript"
+                        : selectedLanguage.toLowerCase()
+                    }
                     value={code}
-                    onChange={(value) => setCode(value || '')}
-                    theme={theme === 'dark' ? 'vs-dark' : 'light'}
+                    onChange={(value) => setCode(value || "")}
+                    theme={theme === "dark" ? "vs-dark" : "light"}
                     options={{
                       minimap: { enabled: false },
                       fontSize: 16,
-                      lineNumbers: 'on',
+                      lineNumbers: "on",
                       roundedSelection: false,
                       scrollBeyondLastLine: false,
                       automaticLayout: true,
                       tabSize: 2,
-                      wordWrap: 'on',
+                      wordWrap: "on",
                     }}
                   />
                 </div>
@@ -288,7 +346,7 @@ const ProblemIdPage = ({ params }) => {
                     className="flex items-center gap-2"
                   >
                     <Play className="h-4 w-4" />
-                    {isRunning ? 'Running...' : 'Run'}
+                    {isRunning ? "Running..." : "Run"}
                   </Button>
                   <Button
                     onClick={handleSubmit}
@@ -296,7 +354,7 @@ const ProblemIdPage = ({ params }) => {
                     className="flex items-center gap-2"
                   >
                     <Send className="h-4 w-4" />
-                    {isSubmitting ? 'Submitting...' : 'Submit'}
+                    {isSubmitting ? "Submitting..." : "Submit"}
                   </Button>
                 </div>
               </CardContent>
@@ -315,16 +373,22 @@ const ProblemIdPage = ({ params }) => {
                   <div className="space-y-4">
                     {problem.testCases.map((testCase, index) => (
                       <div key={index} className="border rounded-lg p-3">
-                        <div className="text-sm font-medium mb-2">Test Case {index + 1}</div>
+                        <div className="text-sm font-medium mb-2">
+                          Test Case {index + 1}
+                        </div>
                         <div className="space-y-1 text-sm">
                           <div>
-                            <span className="text-muted-foreground">Input: </span>
+                            <span className="text-muted-foreground">
+                              Input:{" "}
+                            </span>
                             <code className="bg-muted px-2 py-1 rounded text-xs">
                               {testCase.input}
                             </code>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">Expected: </span>
+                            <span className="text-muted-foreground">
+                              Expected:{" "}
+                            </span>
                             <code className="bg-muted px-2 py-1 rounded text-xs">
                               {testCase.output}
                             </code>
@@ -341,11 +405,12 @@ const ProblemIdPage = ({ params }) => {
             {executionResponse && executionResponse.submission && (
               <div className="space-y-4 mt-4">
                 <SubmissionDetails submission={executionResponse.submission} />
-                <TestCaseTable testCases={executionResponse.submission.testCases} />
+                <TestCaseTable
+                  testCases={executionResponse.submission.testCases}
+                />
               </div>
             )}
           </div>
-          
         </div>
       </div>
     </div>
