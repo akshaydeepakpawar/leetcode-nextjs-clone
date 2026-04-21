@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import {
   Code2,
   Trophy,

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getAllProblems } from '@/modules/problems/actions';
 import ProblemsTable from '@/modules/problems/components/problemTable';
 import { currentUser } from "@clerk/nextjs/server";
