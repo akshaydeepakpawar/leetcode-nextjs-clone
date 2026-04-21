@@ -35,9 +35,6 @@ const Navbar = async ({ userRole }) => {
             <Link href="/problems" className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400">
               Problems
             </Link>
-            <Link href="/about" className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400">
-              About
-            </Link>
             <Link href="/profile" className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400">
               Profile
             </Link>

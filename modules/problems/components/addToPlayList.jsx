@@ -20,7 +20,7 @@ const AddToPlaylistModal = ({ isOpen, onClose, onSubmit, problemId }) => {
   useEffect(() => {
     const loadPlaylists = async () => {
       try {
-        const response = await fetch('/api/playlists');
+        const response = await fetch("/api/playlists");
         const data = await response.json();
         if (data.success) {
           setPlaylists(data.playlists);
@@ -28,10 +28,10 @@ const AddToPlaylistModal = ({ isOpen, onClose, onSubmit, problemId }) => {
           throw new Error(data.error);
         }
       } catch (error) {
-        console.error('Error loading playlists:', error);
+        console.error("Error loading playlists:", error);
         toast.error("Failed to load playlists");
       }
-    }; 
+    };
 
     if (isOpen) {
       loadPlaylists();
@@ -41,10 +41,15 @@ const AddToPlaylistModal = ({ isOpen, onClose, onSubmit, problemId }) => {
   const handleAddToPlaylist = async (playlistId) => {
     try {
       setIsLoading(true);
-      await onSubmit(problemId, playlistId);
+      const res = await onSubmit(problemId, playlistId);
+      if (!res.success) {
+        toast.error(res.error || "Failed to add problem");
+        return;
+      }
+      toast.success("Problem added to playlist");
       onClose();
     } catch (error) {
-      console.error('Error adding to playlist:', error);
+      console.error("Error adding to playlist:", error);
       toast.error("Failed to add problem to playlist");
     } finally {
       setIsLoading(false);

@@ -108,7 +108,7 @@ const ProblemsTable = ({ problems, user }) => {
       const result = await response.json();
 
       if (!response.ok) {
-        // ❌ duplicate case
+        // duplicate case
         toast({
           title: "Duplicate Playlist",
           description: data.error || "Playlist already exists",
@@ -125,26 +125,24 @@ const ProblemsTable = ({ problems, user }) => {
   };
 
   const handleAddToPlaylist = async (problemId, playlistId) => {
-    try {
-      const response = await fetch("/api/playlists/add-problem", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ problemId, playlistId }),
-      });
+  try {
+    const response = await fetch("/api/playlists/add-problem", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ problemId, playlistId }),
+    });
 
-      const result = await response.json();
+    const result = await response.json();
 
-      if (result.success) {
-        setIsAddToPlaylistModalOpen(false);
-        toast.success("Problem added to playlist");
-      } else {
-        throw new Error(result.error);
-      }
-    } catch (error) {
-      console.error("Error adding to playlist:", error);
-      toast.error(error.message || "Failed to add problem to playlist");
-    }
-  };
+    return result;
+
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+};
 
   const getDifficultyVariant = (difficulty) => {
     switch (difficulty) {
